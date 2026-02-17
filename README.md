@@ -1,4 +1,4 @@
-Automação TXT para Markdown (Recursiva)
+automação TXT para Markdown (Recursiva)
 Este projeto consiste em um script Bash integrado ao systemd para monitorar e converter automaticamente arquivos .txt em .md (Markdown) de forma recursiva. Desenvolvido para otimizar fluxos de trabalho no Linux, garantindo que qualquer nota salva seja instantaneamente transformada e o arquivo original removido.
 
 Cenário e Problemas Resolvidos
@@ -61,3 +61,25 @@ Gabriel William
 Estudante de Big Data para Negócios (Fatec Ipiranga) e Gestão Financeira (UniFatecie).
 Foco em Análise de Dados, Ciência de Dados e Automação.
 
+=======
+# Automação Recursiva: TXT para Markdown 
+
+Este projeto automatiza a conversão de arquivos `.txt` para `.md` em sistemas Linux, utilizando **Bash Scripting** e monitoramento de eventos do kernel via **inotify-tools**. A solução foi desenhada para ser leve, persistente e recursiva.
+
+##  Problemas Resolvidos
+* **Monitoramento Ativo**: Identifica novos arquivos via eventos `close_write` e `moved_to`.
+* **Recursividade**: Atua na pasta principal e em todos os seus subdiretórios.
+* **Automação de Limpeza**: Remove o arquivo original após a conversão bem-sucedida.
+* **Persistência**: Executa como um serviço de usuário do `systemd`, garantindo que o processo rode em segundo plano desde o login.
+
+##  Tecnologias e Ambiente
+* **OS**: Debian 13 (Trixie)
+* **Hardware**: Intel Core i5-7500T | 16GB RAM
+* **Ferramentas**: Bash, inotify-tools, Systemd
+
+##  Instalação e Uso
+
+1. **Instale as dependências:**
+   ```bash
+   sudo apt update && sudo apt install inotify-tools -y
+>>>>>>> a381b24 (Inital Commit: Automação recursiva de conversão txt para md)
