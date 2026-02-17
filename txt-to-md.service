@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 # Verifique se o caminho abaixo está correto para o seu usuário
-ExecStart=/bin/bash /home/gab/automacao-txt-md/converter.sh
+ExecStart=/bin/bash %h/automacao-txt-md/converter.sh
 Restart=always
 RestartSec=5
 
