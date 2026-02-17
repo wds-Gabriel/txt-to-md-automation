@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Defina o caminho absoluto da sua pasta principal
-TARGET_DIR="/home/gab/Cérebro"
+TARGET_DIR="/$home/pasta"
 
 # -r: recursivo (monitora subpastas)
 # -e: monitora criação, fechamento de escrita e movimentação
