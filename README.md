@@ -1,85 +1,135 @@
-automação TXT para Markdown (Recursiva)
-Este projeto consiste em um script Bash integrado ao systemd para monitorar e converter automaticamente arquivos .txt em .md (Markdown) de forma recursiva. Desenvolvido para otimizar fluxos de trabalho no Linux, garantindo que qualquer nota salva seja instantaneamente transformada e o arquivo original removido.
+# Automação Recursiva: TXT para Markdown
 
-Cenário e Problemas Resolvidos
-Durante o desenvolvimento no Debian 13 (Trixie), identifiquei que o monitoramento simples de pastas não atendia a todas as necessidades. Este projeto resolve:
+Este projeto consiste em um script Bash integrado ao `systemd` para monitorar e converter automaticamente arquivos `.txt` em `.md` (Markdown) de forma recursiva.
 
-Recursividade: Monitora não apenas a pasta raiz, mas todos os subdiretórios criados.
+---
 
-Confiabilidade de Eventos: Utiliza os eventos close_write e moved_to do kernel para garantir que a conversão só ocorra após o arquivo ser totalmente gravado no disco.
+## O Projeto sob a Metodologia STAR
 
-Persistência: Transforma o script em um serviço de usuário do systemd, rodando silenciosamente em segundo plano desde o login.
+### Situation (Situação)
 
-Limpeza Automática: Remove o arquivo .txt original após o sucesso da cópia para manter o diretório organizado.
+No desenvolvimento de fluxos de trabalho locais utilizando o sistema operacional **Debian 13 (Trixie)**, havia a necessidade de centralizar e padronizar notas e registros textuais no formato Markdown (`.md`). Ferramentas tradicionais de monitoramento simples de pastas eram limitadas: elas falhavam em processar estruturas complexas de diretórios (subpastas) e frequentemente tentavam ler arquivos que ainda estavam sendo gravados em disco, gerando corrupção de dados ou falhas de sincronização automática.
 
-Tecnologias Utilizadas
-Sistema Operacional: Debian 13 (Trixie).
+### Task (Tarefa)
 
-Linguagem: Bash Script.
+O desafio consistia em projetar e implementar uma solução de background que cumprisse as seguintes premissas:
 
-Ferramentas: inotify-tools (para monitoramento de eventos do sistema de arquivos).
+* **Monitoramento Completo:** Rastrear não apenas o diretório raiz, mas qualquer subpasta criada dinamicamente (recursividade).
 
-Gerenciador de Serviços: Systemd (User mode).
 
-Como Instalar
-1. Pré-requisitos
-Certifique-se de ter o inotify-tools instalado:
+* **Integridade dos Dados:** Garantir que a conversão só ocorresse após o encerramento completo da escrita do arquivo.
 
-Bash
+
+* **Persistência:** O processo deveria rodar silenciosamente em segundo plano, iniciando automaticamente junto com o login do usuário, sem necessidade de intervenção manual no terminal.
+
+
+* **Organização Automática:** Eliminar resíduos removendo o arquivo `.txt` original após o sucesso da cópia para manter o ambiente limpo.
+
+
+
+### Action (Ação)
+
+Para solucionar o problema, foram adotadas as seguintes estratégias técnicas:
+
+1. **Garantia de Eventos com o Kernel:** Utilização da biblioteca `inotify-tools` para escutar especificamente os eventos `close_write` (arquivo fechado após escrita) e `moved_to` (arquivo movido para o diretório) do kernel do Linux, mitigando erros de leitura precoce.
+
+
+2. **Modularização em Bash:** Desenvolvimento de um script Bash robusto estruturado com loops lógicos para varredura e tratamento de caminhos com espaços ou caracteres especiais.
+
+
+3. **Sustentação via Systemd:** Criação e configuração de uma unidade de serviço de usuário (`systemd --user`), transformando o script em um daemon persistente atrelado à sessão do usuário.
+
+
+
+### Result (Resultado)
+
+A implementação resultou em um ecossistema de automação local altamente confiável e invisível para o usuário:
+
+* **Conversão em Tempo Real:** Arquivos `.txt` salvos em qualquer nível da árvore de diretórios especificada geram instantaneamente sua contraparte `.md` correspondente.
+
+
+* **Eficiência de Armazenamento:** A limpeza pós-conversão eliminou com 100% de eficácia a duplicidade de arquivos.
+
+
+* **Confiabilidade:** O consumo de recursos de hardware (testado em CPU Intel i5-7500T e 15 GB RAM) manteve-se insignificante, operando com estabilidade ininterrupta desde o boot do sistema.
+
+---
+
+## Tecnologias e Ambiente
+
+* **Sistema Operacional:** Debian 13 (Trixie).
+
+
+* **Especificações de Hardware Testadas:** Intel Core i5-7500T (Quad Core, 3.1 GHz) | 15 GB RAM | Intel HD Graphics 630.
+* **Linguagem:** Bash Script.
+
+
+* **Ferramentas Chave:** inotify-tools (inotifywait) & Systemd (User mode).
+
+
+
+---
+
+## Instalação e Configuração
+
+### 1. Instalar Pré-requisitos
+
+Certifique-se de possuir o `inotify-tools` instalado em seu sistema:
+
+```bash
 sudo apt update && sudo apt install inotify-tools -y
-2. Configuração do Script
-Salve o script converter.sh em sua pasta de preferência e conceda permissão de execução:
 
-Bash
+```
+
+### 2. Configurar o Script
+
+Salve o script `converter.sh` em sua pasta de preferência e conceda a permissão necessária para execução:
+
+```bash
 chmod +x ~/converter.sh
-3. Configuração do Serviço (Systemd)
-Para que o script rode automaticamente no seu usuário:
 
-Crie o diretório de serviços caso não exista: mkdir -p ~/.config/systemd/user/
+```
 
-Mova o arquivo txt-to-md.service para esta pasta.
+### 3. Configuração do Serviço (Systemd)
 
-Ative o serviço:
+Para habilitar a persistência do script em sua conta de usuário:
 
-Bash
-systemctl --user daemon-reload
-systemctl --user enable txt-to-md.service
-systemctl --user start txt-to-md.service
+1. Crie o diretório de serviços do usuário, caso ele não exista:
+```bash
+mkdir -p ~/.config/systemd/user/
 
-Demonstração de Uso
-Ao salvar qualquer arquivo em /caminho/da/sua/pasta/nota.txt, o serviço detecta a alteração e:
+```
 
-Gera um arquivo nota.md com o mesmo conteúdo.
 
-Exclui o arquivo nota.txt original.
 
-Registra a operação nos logs do sistema.
-
-Autor
-Gabriel William
-
-Estudante de Big Data para Negócios (Fatec Ipiranga) e Gestão Financeira (UniFatecie).
-Foco em Análise de Dados, Ciência de Dados e Automação.
-
-=======
-# Automação Recursiva: TXT para Markdown 
-
-Este projeto automatiza a conversão de arquivos `.txt` para `.md` em sistemas Linux, utilizando **Bash Scripting** e monitoramento de eventos do kernel via **inotify-tools**. A solução foi desenhada para ser leve, persistente e recursiva.
-
-##  Problemas Resolvidos
-* **Monitoramento Ativo**: Identifica novos arquivos via eventos `close_write` e `moved_to`.
-* **Recursividade**: Atua na pasta principal e em todos os seus subdiretórios.
-* **Automação de Limpeza**: Remove o arquivo original após a conversão bem-sucedida.
-* **Persistência**: Executa como um serviço de usuário do `systemd`, garantindo que o processo rode em segundo plano desde o login.
-
-##  Tecnologias e Ambiente
-* **OS**: Debian 13 (Trixie)
-* **Hardware**: Intel Core i5-7500T | 16GB RAM
-* **Ferramentas**: Bash, inotify-tools, Systemd
-
-##  Instalação e Uso
-
-1. **Instale as dependências:**
+```
+2. Mova o arquivo `txt-to-md.service` para a pasta criada acima.
+3. Recarregue os daemons do systemd e inicialize o serviço:
    ```bash
-   sudo apt update && sudo apt install inotify-tools -y
->>>>>>> a381b24 (Inital Commit: Automação recursiva de conversão txt para md)
+   systemctl --user daemon-reload
+   systemctl --user enable txt-to-md.service
+   systemctl --user start txt-to-md.service
+
+```
+
+---
+
+## Demonstração de Uso
+
+Ao salvar ou mover qualquer arquivo de texto para a pasta monitorada:
+
+```text
+/seu-diretorio-monitorado/
+└── nota.txt  (Criado ou modificado)
+
+```
+
+O serviço intercepta o gatilho do kernel instantaneamente e altera o cenário para:
+
+```text
+/seu-diretorio-monitorado/
+└── nota.md   (Conteúdo preservado e convertido)
+
+```
+
+*O arquivo `nota.txt` original é deletado e a ação é documentada nos registros de logs do sistema.*
